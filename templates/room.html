@@ -1,0 +1,227 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
+    <title>Hello, world!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+        body {
+            margin-top: 20px;
+            font-family: 'Varela Round', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .chat-online {
+            color: #34ce57
+        }
+
+        .chat-offline {
+            color: #e4606d
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            overflow-y: scroll;
+            max-height: 70vh;
+            background-color: #fdfdfd;
+        }
+
+        .chat-message-left,
+        .chat-message-right {
+            display: flex;
+            flex-shrink: 0
+        }
+
+        .chat-message-left {
+            margin-right: auto
+        }
+
+        .chat-message-right {
+            flex-direction: row-reverse;
+            margin-left: auto;
+        }
+
+        .py-3 {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
+        .px-4 {
+            padding-right: 1.5rem !important;
+            padding-left: 1.5rem !important;
+        }
+
+        .flex-grow-0 {
+            flex-grow: 0 !important;
+        }
+
+        .border-top {
+            border-top: 1px solid #dee2e6 !important;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+</head>
+
+<body class="border border-3 mx-auto my-2" style="max-width: 70vw; min-width: 400px;">
+
+    <div class="py-2 px-4 border-bottom">
+        <div class="d-flex align-items-center py-1">
+            <div class="position-relative">
+                <img src="{{gdp}}" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40">
+            </div>
+            <div class="flex-grow-1 pl-3">
+                <strong>{{r.name}}</strong>
+                <div class="text-muted small">Django-Chats Room ID: {{r.room_id}}</div>
+            </div>
+            <div>
+                <a href="/checkoutroom/{{r.room_id}}/" class="btn btn-outline-primary" type="button">Return to Home Page</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="position-relative">
+        <div class="chat-messages p-4">
+            <div class="mx-auto mb-4 alert-warning alert text-center">
+                <strong>Messages are end-to-end encrypted.No one outside of this chat would be able to see
+                    them..</strong>
+            </div>
+
+            
+
+            <div id="display"></div>
+
+            <script>
+                function formatdate(str) {
+                    var t = date.getTime();
+                    t = t + date.getTimeZoneOffset();
+                    date.setTime(t);
+
+                    var hours = date.getHours();
+                    var minutes = date.getMinutes();
+                    var ampm = hours >= 12 ? 'pm' : 'am';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12; // the hour '0' should be '12'
+                    minutes = minutes < 10 ? '0' + minutes : minutes;
+                    var strTime = hours + ':' + minutes + ' ' + ampm;
+                    return strTime;
+                }
+
+                $(document).ready(function () {
+
+                    setInterval(function () {
+
+                        jQuery.ajax({
+                            type: 'GET',
+                            url: "/getMessages/{{r.room_id}}/",
+                            success: function (response) {
+                                console.log(response);
+                                $("#display").empty();
+
+                                Object.keys(response.messages).reverse().forEach(function (key) {
+                                    
+                                    var d = new Date(response.messages[key]['date'].slice(0,19)+"+05:30");
+                                    var cdf = d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+                                    // var temp = "<div class='container darker'><b>" + response.usernames[key] + "</b><p>" + response.messages[key]['value'] + "</p><span class='time-left'>" + cdf + "</span></div>";
+                                    // $("#display").append(temp);
+                                    if (response.usernames[key] == '{{request.user.username}}') {
+
+                                        var temp = '<div class="chat-message-right pb-4"><div><img src="' + response.dp[key] + '" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"><div class="text-muted small text-nowrap mt-2">' + cdf + '</div></div><div class="flex-shrink-1 rounded py-2 px-3 mx-2" style="background-color: #c0f8f9; border-left: 2px solid teal;"><div class="font-weight-bold mb-1">You</div>' + response.messages[key]["value"] + '</div></div>';
+                                    }
+                                    else {
+                                        var temp = '<div class="chat-message-left pb-4"><div><img src="' + response.dp[key] + '" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"><div class="text-muted small text-nowrap mt-2">' + cdf + '</div></div><div class="flex-shrink-1 rounded py-2 px-3 mx-2" style="border-right: 2px solid lightgrey;"><div class="font-weight-bold mb-1">' + response.usernames[key] + '</div>' + response.messages[key]["value"] + '</div></div>';
+                                    }
+
+                                    $("#display").append(temp);
+                                });
+
+                                // for (var key in response.messages) {
+                                //     var temp = "<div class='container darker'><b>" + response.usernames[key] + "</b><p>" + response.messages[key]['value'] + "</p><span class='time-left'>" + response.messages[key]['date'] + "</span></div>";
+                                //     $("#display").append(temp);
+                                // }
+                            },
+                            error: function (response) {
+                                alert('An error occured');
+                            }
+                        });
+                    }, 1000);
+                })
+            </script>
+
+        </div>
+
+        <div class="sender">
+
+            <div class="flex-grow-0 py-3 px-4 border-top">
+                <form id="post-form">
+                    {% csrf_token %}
+                    <!-- <input type="hidden" name="username" id="username" value="{{request.user.username}}" />
+                        <input type="hidden" name="room_id" id="room_id" value="{{r.room_id}}" />
+                        <input type="text" name="message" id="message" width="100px" />
+                        <input type="submit" value="Send"> -->
+
+                    <input type="hidden" name="username" id="username" value="{{request.user.username}}" />
+                    <input type="hidden" name="room_id" id="room_id" value="{{r.room_id}}" />
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Type your message" name="message"
+                            id="message">
+                        <button class="btn btn-primary" type="submit" value="Send">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+                    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+                    crossorigin="anonymous"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+<script type="text/javascript">
+    var targetScrolledDown = document.querySelector(".chat-messages");
+    targetScrolledDown.scrollTop = targetScrolledDown.scrollHeight;
+
+    $(document).on('submit', '#post-form', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '/send',
+            data: {
+                username: $('#username').val(),
+                room_id: $('#room_id').val(),
+                message: $('#message').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (data) {
+                //alert(data)
+            }
+        });
+        document.getElementById('message').value = ''
+    });
+</script>
+
+</html>

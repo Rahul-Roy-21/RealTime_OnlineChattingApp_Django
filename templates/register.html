@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+	@import url('https://fonts.googleapis.com/css2?family=Antic+Slab&display=swap');
+        *{
+            font-family: 'Antic Slab', sans-serif;
+        }
+        .input-Box{
+            margin: 5px 0;
+        }
+        input{
+            padding: 5px;
+        }
+        .btn{
+            padding: 10px;
+            border-style:outset;
+            font-family: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="form-signin" method="POST" action="/register">
+        {% csrf_token %}
+        <h1 class="h3 mb-3 text-center">Register Portal</h1>
+
+        <div class="input-Box">
+            <label for="inputuser" class="sr-only">Username</label>
+            <input type="text" id="inputuser" name="username" class="form-control" placeholder="Username" required
+                autofocus>
+        </div>
+        <div class="input-Box">
+            <label for="inputEmail" class="sr-only">Email Address</label>
+            <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email Address" required>
+        </div>
+        <div class="input-Box form-group row">
+            <label for="exampleFormControlFile1" class=" mb-0 col-5">Upload a Profile Pic</label>
+            <input type="file" class="form-control-file col-7" id="exampleFormControlFile1" name="dp">
+        </div>
+        <div class="input-Box">
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" id="inputPassword" name="password" class="form-control"
+                placeholder="Password (min. 5 chars)" required>
+        </div>
+        <div class="input-Box">
+            <label for="inputcPassword" class="sr-only">Confirm Password</label>
+            <input type="password" id="inputcPassword" name="cpassword" class="form-control"
+                placeholder="Confirm Password" required>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up Now</button>
+        <h2 class="my-3 text-decoration-none">Have An Account? Please Login <a href="/login">here..</a></h2>
+        <!-- <p class="mt-3 mb-3 text-muted">Tech-World's &copy; 2020-2021</p> -->
+    </form>
+</body>
+
+</html>
